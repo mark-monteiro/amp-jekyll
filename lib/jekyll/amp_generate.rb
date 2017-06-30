@@ -6,10 +6,10 @@ module Jekyll
       @base = base
       @dir = dir
       @name = 'index.html'
+      
       self.process(@name)
-      self.read_yaml(File.join(base, '_layouts'), 'amp.html')
-      self.content               = post.content
-      self.data['body']          = (Liquid::Template.parse post.content).render site.site_payload
+      self.read_yaml(File.dirname(post.path), File.basename(post.path))
+      self.data['layout'] = 'amp'
 
       # Merge all data from post so that keys from self.data have higher priority
       self.data = post.data.merge(self.data)
@@ -22,6 +22,7 @@ module Jekyll
       self.data.delete('permalink')
 
       self.data['canonical_url'] = post.url
+      self.data['isAmp'] = true
     end
   end
   # Generates a new AMP post for each existing post
