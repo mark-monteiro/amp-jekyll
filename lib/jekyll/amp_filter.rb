@@ -83,6 +83,33 @@ module Jekyll
       # Return the html as plaintext string
       doc.to_s
     end
+
+    # Filter for HTML Twitter embeds
+    # Converts all twitter embeds in the provided input to 'amp-twitter' elements
+    # Parameters:
+    #   input       - the content to filter
+    def amp_twitter(input)
+      doc = Nokogiri::HTML.fragment(input)
+
+      # Iterate through each Twitter embed in the input
+      doc.css('.jekyll-twitter-plugin').each do |embed|
+        # Delete all script tags
+        embed.search('.//script').map(&:remove)
+        
+        # Get the Tweet ID; exit if no id
+        tweetId = embed.search('.//a/@href').last
+        return if tweetId.to_s.empty?
+        tweetId = tweetId.value.split('/').last
+
+        # Wrap blockquote with amp-twitter and add placeholder attribute
+        blockquote = embed.search('blockquote')
+        blockquote.wrap("<amp-twitter layout='responsive' width='390' height='330' data-tweetid='#{tweetId}'>")
+        blockquote.first['placeholder'] = 'placeholder'
+      end
+
+      # Return the html as plaintext string
+      doc.to_s
+    end
   end
 end
 
